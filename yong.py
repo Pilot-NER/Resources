@@ -1,6 +1,6 @@
 import csv
 import nltk
-from geotext import GeoText
+from GeoExtraction import geoextraction
 
 MEMO_STRING = 0
 VENDOR = 1
@@ -25,11 +25,5 @@ yong_memos_list = memos_list[200:]
 yong_vendors_list = vendors_list[200:]
 
 # Extract location
-def map_memo_to_location(memos_list):
-    memo_to_location_dict = dict()
-    for memo in memos_list:
-        str = GeoText("Yes")
-        memo_to_location_dict[memo] = str.cities
-    return memo_to_location_dict
-
-print(map_memo_to_location(yong_memos_list))
+y = geoextraction.GeoExtraction(yong_memos_list[1])
+print(y.location())
