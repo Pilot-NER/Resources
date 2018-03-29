@@ -3,8 +3,6 @@ import csv
 MEMO_STRING = 0
 VENDOR = 1
 
-print "Hello World"
-
 # lists
 memos_list = []
 vendors_list = []
@@ -24,6 +22,7 @@ with open("Sample memos - memos.csv", 'r') as memofile:
 # functions to analyze the pattern
 
 def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
-    pass
+    for _ in memos_list.length:
+        
 
 analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
