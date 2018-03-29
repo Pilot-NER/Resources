@@ -26,9 +26,9 @@ with open("Sample memos - memos.csv", 'r') as memofile:
 def remove_date_ref_Crd(memos_list, vendors_list, memo_to_vendor_dict):
 	# remove the date from the string (assume format - "MM/DD")
 	
-	date = "[^\s]*\d\d/\d\d[^\s]*"
-	ref = "(?i)ref[\d^\s]*"
-	crd = "(?i)crd[\d^\s]*"
+	date = "[^\s]*\d\d/\d\d[^\s]*" 	# date
+	ref = "(?i)ref[\d^\s]*"		   	# reference number in format "REF...""	
+	crd = "(?i)crd[\d^\s]*"		   	# credit number in format "CRD..."		
 	# num = "[^\s]*\d\d\d\d+[^\s]*"
 
 	new_list = []
@@ -64,9 +64,23 @@ def before_keywords(memos_list):
 	return ans
 
 alg_9 = before_keywords(memos_list_wo_date)
-for m, k in alg_9.items():
-	print(m, ":", k)
+# for m, k in alg_9.items():
+# 	print(m, ":", k)
 
+
+# algorithm 3
+def less_than_3(memos_list):
+	ans = dict()
+	num_location = "[^\s]*\d\d\d[^\s]*|\sCA\s" # numbers or "CA" california
+	for m in memos_list:
+		tmp = m.split()
+		if len(tmp) <=3:
+			tmp_s = re.sub(num_location, "", m)
+			ans[m] = tmp_s.lstrip().rstrip()
+
+	return ans
+
+print(less_than_3(memos_list_wo_date))
 
 
 
