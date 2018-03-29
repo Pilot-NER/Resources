@@ -21,7 +21,5 @@ with open("Sample memos - memos.csv", 'r') as memofile:
 
 # functions to analyze the pattern
 
-def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
-    pass
-
-analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
+def analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict):
+	pass
