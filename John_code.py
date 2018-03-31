@@ -1,4 +1,5 @@
 import csv
+import re
 
 MEMO_STRING = 0
 VENDOR = 1
@@ -20,9 +21,14 @@ with open("Sample memos - memos.csv", 'r') as memofile:
 
 
 # functions to analyze the pattern
+def remove_abr(memos_list):
+    for i in memos_list:
+        # memos less than or equal to three words are left alone
+        if len(memos_list[i].split()) <= 3
+            pass ##### or would it be break?
+        else:
+            #remove abbreviations such as debt car/credit card, ref, crd, dt number, Paypal, etc.
+            shorthands = "(?i)debit card|credit card|debit|credit|card|crd|ref|cashier check purchase|paypal"
+            memos_list[i] = re.sub(' +',' ',re.sub(shorthands, '', memos_list[i]))
 
-def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
-    for _ in memos_list.length:
-        
-
-analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
+remove_abr(memos_list)
