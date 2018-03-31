@@ -43,6 +43,16 @@ def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
         matches=re.findall(r'\"(.+?)\"',memos_list[x])
         if matches != []:
             sorted_list[x+1][1] = matches[0]
+
+    #8. after * is NAME
+
+    # !!! double repeated algo takes precedence as mre effective
+    # !!! meaningless alphanumeric chains, dates, locations, common words (debit) need to be removed first
+    for x in range(len(memos_list)):
+        if memos_list[x].count('*') == 1:
+            sorted_list[x+1][1]=memos_list[x][memos_list[x].find('*'):]
+            print(sorted_list[x+1])
+
     return(1)
 
 analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
