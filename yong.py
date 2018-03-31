@@ -80,8 +80,50 @@ def less_than_3(memos_list):
 
 	return ans
 
-print(less_than_3(memos_list_wo_date))
+alg_3 = less_than_3(memos_list_wo_date)
 
+
+# algorithm 2
+def extract_repeated(memos_list):
+	names = []
+	for m in memos_list:
+		m = m.split()
+		tmp_set = set()
+		tmp_str = ""
+		for c in m:
+			if c in tmp_set:
+				tmp_str += c
+				tmp_str += " " 
+			else:
+				tmp_set.add(c)
+		if tmp_str:
+			names.append(tmp_str.rstrip()) 
+	return names
+
+alg_2 = extract_repeated(memos_list_wo_date)
+
+# algorithm 14
+def remove_numbers_mixed_alphanumerics(memos_list):
+	num = "[^s]*\d\d\d\d\d+[^s]*" # more than 5 numbers
+	alt_alphanum = "(?i)[^s][a-z]+\d+\w*[^s]" 	# alternating numbers and alphabets (alphabets come first)
+	alt_alphanum_2 = "(?i)[^s]\d+[a-z]+\w*[^s]" # alternating numbers and alphabets (numbers come first)
+
+
+	L = list()
+
+	for m in memos_list:
+		tmp = re.split(num + "|" + alt_alphanum + "|" + alt_alphanum_2, m)
+		tmp = [x.lstrip().rstrip() for x in tmp]
+		tmp = ' '.join(tmp).lstrip().rstrip()
+		# print(m, tmp)
+		if tmp:
+			L.append(tmp)
+
+	return L
+
+alg_14 = remove_numbers_mixed_alphanumerics(memos_list_wo_date)
+pprint.pprint(alg_14)
+print(len(alg_14))
 
 
 
