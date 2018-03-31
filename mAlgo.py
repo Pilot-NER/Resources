@@ -44,7 +44,7 @@ def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
         if matches != []:
             sorted_list[x+1][1] = matches[0]
 
-    #8. after * is NAME
+    # 8. after * is NAME
 
     # !!! double repeated algo takes precedence as mre effective
     # !!! meaningless alphanumeric chains, dates, locations, common words (debit) need to be removed first
@@ -52,6 +52,19 @@ def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
         if memos_list[x].count('*') == 1:
             sorted_list[x+1][1]=memos_list[x][memos_list[x].find('*'):]
             print(sorted_list[x+1])
+
+
+    # 10a. Abbreviations >> Full Name
+    with open("abbreviations.csv", 'r') as abbvfile:
+        abbv = csv.reader(abbvfile)
+        next(abbv)
+        for row in abbv:
+            abbv_to_name_dict[row[0]] = row[1:]
+
+        for x in range(len(memos_list)):
+            for y in abbv_to_name_dict.keys():
+                if y in memos_list[x]:
+                    sorted_list[x+1].replace(y,abbv_to_name_dict[y])
 
     return(1)
 
