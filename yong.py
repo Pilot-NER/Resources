@@ -1,6 +1,7 @@
 import csv
 import re # regex
 import pprint
+from GeoExtraction.geoextraction import GeoExtraction
 
 MEMO_STRING = 0
 VENDOR = 1
@@ -27,8 +28,8 @@ def remove_date_ref_Crd(memos_list, vendors_list, memo_to_vendor_dict):
 	# remove the date from the string (assume format - "MM/DD")
 	
 	date = "[^\s]*\d\d/\d\d[^\s]*" 	# date
-	ref = "(?i)ref[\d^\s]*"		   	# reference number in format "REF...""	
-	crd = "(?i)crd[\d^\s]*"		   	# credit number in format "CRD..."		
+	ref = "(?i)[^\s]*ref[\d^\s]*"		   	# reference number in format "REF...""	
+	crd = "(?i)[^\s]*crd[\d^\s]*"		   	# credit number in format "CRD..."		
 	# num = "[^\s]*\d\d\d\d+[^\s]*"
 
 	new_list = []
@@ -80,9 +81,64 @@ def less_than_3(memos_list):
 
 	return ans
 
-print(less_than_3(memos_list_wo_date))
+alg_3 = less_than_3(memos_list_wo_date)
 
 
+# algorithm 2
+def extract_repeated(memos_list):
+	names = []
+	for m in memos_list:
+		m = m.split()
+		tmp_set = set()
+		tmp_str = ""
+		for c in m:
+			if c in tmp_set:
+				tmp_str += c
+				tmp_str += " " 
+			else:
+				tmp_set.add(c)
+		if tmp_str:
+			names.append(tmp_str.rstrip()) 
+	return names
+
+alg_2 = extract_repeated(memos_list_wo_date)
+
+# algorithm 14
+def remove_numbers_mixed_alphanumerics(memos_list):
+	num = "[^s]*\d\d\d\d\d+[^s]*" # more than 5 numbers
+	alt_alphanum = "(?i)[^s][a-z]+\d+\w*[^s]" 	# alternating numbers and alphabets (alphabets come first)
+	alt_alphanum_2 = "(?i)[^s]\d+[a-z]+\w*[^s]" # alternating numbers and alphabets (numbers come first)
 
 
+	L = list()
 
+	for m in memos_list:
+		tmp = re.split(num + "|" + alt_alphanum + "|" + alt_alphanum_2, m)
+		tmp = [x.lstrip().rstrip() for x in tmp]
+		tmp = ' '.join(tmp).lstrip().rstrip()
+		# print(m, tmp)
+		if tmp:
+			L.append(tmp)
+
+	return L
+
+alg_14 = remove_numbers_mixed_alphanumerics(memos_list_wo_date)
+
+
+# algorithm 10
+def return_and_remove_location(memos_list):
+	new_memos, location_dict = list(), dict()
+	G = GeoExtraction()
+	count = 0
+	for m in memos_list:
+		l = G.extract_location(m)
+		new_m = G.remove_location(m)
+		new_memos.append(m)
+		location_dict[new_m] = l
+		print(count)
+		count+=1
+
+	return new_memos, location_dict
+
+new_m , location_dict = return_and_remove_location(memos_list_wo_date)
+print(location_dict)
