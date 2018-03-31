@@ -21,13 +21,26 @@ with open("Sample memos - memos.csv", 'r') as memofile:
 
 
 # functions to analyze the pattern
-
-def remove_abr(memos_list, vendors_list, memo_to_vdendor_dict):
-    #remove abbreviations such as debt car/credit card, ref, crd, dt number, Paypal, etc.
-    for i in len(memos_list):
-        if len(memos_list[i].split()) <= 3
-            pass
+def remove_abr(memos_list):
+    for mem in memos_list:
+        # memos less than or equal to three words are left alone
+        if len(mem.split()) <= 3
+            pass ##### or would it be break?
         else:
-            if memos_list[i] = re.sub("Debit Card", '', memos_list[i])
+            #remove abbreviations such as debt car/credit card, ref, crd, dt number, Paypal, etc.
+            shorthands = "(?i)debit card|credit card|debit|credit|card|crd|ref|cashier check purchase|paypal"
+            mem = re.sub(' +',' ',re.sub(shorthands, '', mem))
+remove_abr(memos_list)
 
-analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
+
+def get_location(memos_list):
+    # We need a new list or something with locations for each vendor (would it be a hashmap?)
+    abr_loc = ["Bay","SFBA","San Franc","San Franciscoca","San Francis","San fransis","sf","San Fran","Frisco","S.F.","etc."]
+        #use csv file for above
+    location = {}
+    for mem in memos_list:
+        if any(x in mem for x in abr_loc):
+        if abr_loc in mem:
+            location = dict.fromkeys(['Bay', 'SFBA'], "Bay Area")
+            my_dict.update(dict.fromkeys(['b', 'e'], 20))
+            dict = dict.fromkeys(seq, 10)
