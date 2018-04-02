@@ -20,15 +20,14 @@ with open("Sample memos - memos.csv", 'r') as memofile:
         memo_to_vendor_dict[row[MEMO_STRING]] = row[VENDOR].lstrip('[\'').rstrip('\']')  # dictionary of memos mapped to vendors
 
 
-# functions to analyze the pattern
 def remove_abr(memos_list):
     for mem in memos_list:
-        # memos less than or equal to three words are left alone
+        #3 memos less than or equal to three words are left alone
         if len(mem.split()) <= 3
             pass ##### or would it be break?
         else:
-            #remove abbreviations such as debt car/credit card, ref, crd, dt number, Paypal, etc.
-            shorthands = "(?i)debit card|credit card|debit|credit|card|crd|ref|cashier check purchase|paypal"
+            #4 remove abbreviations such as debt car/credit card, ref, crd, dt number, Paypal, etc.
+            shorthands = "(?i)debit card|credit card|debit|credit|card|crd|ref|cashier check purchase|paypal| NY | New York | Las Vegas | NV | San Francisco | SF | San Francis |San Mateo | San Jose | Port Melbourn | CA | JAMAICA | Sydney | NS | Log Angeles | AU | Surry Hills | Singapore | SG "
             mem = re.sub(' +',' ',re.sub(shorthands, '', mem))
 remove_abr(memos_list)
 
