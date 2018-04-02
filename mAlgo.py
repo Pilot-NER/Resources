@@ -29,45 +29,61 @@ for x in range(len(memos_list)):
     sorted_list[x+1][0] = memos_list[x]
 
 # functions to analyze the pattern
-def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
+def analyze_pattern12(memos_list, vendors_list, memo_to_vdendor_dict):
     # 12. removing transfers
-    for x in range(len(memos_list)):
-        if 'internet transfer' in memos_list[x].lower():
-            sorted_list[x+1][2] = 'online transfer'
+    for x in memos_list:
+        if 'internet transfer' in x.lower():
+            del memos_list[memos_list.index(x)]
 
-        elif 'online transfer' in memos_list[x].lower():
-            sorted_list[x+1][2] = 'online transfer'
+        elif 'online transfer' in x.lower():
+            del memos_list[memos_list.index(x)]
+    return(memos_list)
 
+def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
     # 1. quotation marks = name
+    match_list = []
     for x in range(len(memos_list)):
         matches=re.findall(r'\"(.+?)\"',memos_list[x])
-        if matches != []:
-            sorted_list[x+1][1] = matches[0]
+        if matches != [] and len(matches) == 1:
+            memos_list[x].replace(matches, '')
+            match_list.append(matches)
+    return(memos_list,match_list)
 
     # 8. after * is NAME
 
     # !!! double repeated algo takes precedence as mre effective
     # !!! meaningless alphanumeric chains, dates, locations, common words (debit) need to be removed first
+def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
     for x in range(len(memos_list)):
+        name_list = []
         if memos_list[x].count('*') == 1:
-            sorted_list[x+1][1]=memos_list[x][memos_list[x].find('*'):]
-            print(sorted_list[x+1])
-
-
+            name = memos_list[x][memos_list[x].find('*'):]
+            memos_list[x].replace(name, '')
+            name_list.append(name)
+    return(memos_list, name_list)
+'''
     # 10a. Abbreviations >> Full Name
-    with open("abbreviations.csv", 'r') as abbvfile:
+    abbv_to_name_dict = {}
+    with open("Abbreviation Patterns - Sheet4.csv", 'r') as abbvfile:
         abbv = csv.reader(abbvfile)
         next(abbv)
         for row in abbv:
-            abbv_to_name_dict[row[0]] = row[1:]
+            abbv_to_name_dict[row[0]] = row[1]
+    print(abbv_to_name_dict)
 
-        for x in range(len(memos_list)):
-            for y in abbv_to_name_dict.keys():
-                if y in memos_list[x]:
-                    sorted_list[x+1].replace(y,abbv_to_name_dict[y])
+    for x in range(len(memos_list)):
+        for y in abbv_to_name_dict.keys():
+            if y in memos_list[x].lower():
+                print(y)
+                print(memos_list[x])
+                if abbv_to_name_dict[y] != '':
+                    #print(sorted_list[x+1])
+                    sorted_list[x+1][0].replace(y,abbv_to_name_dict[y])
+                    #print(sorted_list[x+1])
 
     return(1)
-
+'''
+analyze_pattern12(memos_list, vendors_list, memo_to_vendor_dict)
 analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
-print(sorted_list)
+#print(sorted_list)
 #print(sorted_list[129])
