@@ -53,7 +53,7 @@ def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
 
     # !!! double repeated algo takes precedence as mre effective
     # !!! meaningless alphanumeric chains, dates, locations, common words (debit) need to be removed first
-def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
+def analyze_pattern8(memos_list, vendors_list, memo_to_vdendor_dict):
     for x in range(len(memos_list)):
         name_list = []
         if memos_list[x].count('*') == 1:
@@ -61,6 +61,7 @@ def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
             memos_list[x].replace(name, '')
             name_list.append(name)
     return(memos_list, name_list)
+
 '''
     # 10a. Abbreviations >> Full Name
     abbv_to_name_dict = {}
