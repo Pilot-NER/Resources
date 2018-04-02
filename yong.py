@@ -1,6 +1,7 @@
 import csv
 import re # regex
 import pprint
+from GeoExtraction.geoextraction import GeoExtraction
 
 MEMO_STRING = 0
 VENDOR = 1
@@ -27,8 +28,8 @@ def remove_date_ref_Crd(memos_list, vendors_list, memo_to_vendor_dict):
 	# remove the date from the string (assume format - "MM/DD")
 	
 	date = "[^\s]*\d\d/\d\d[^\s]*" 	# date
-	ref = "(?i)ref[\d^\s]*"		   	# reference number in format "REF...""	
-	crd = "(?i)crd[\d^\s]*"		   	# credit number in format "CRD..."		
+	ref = "(?i)[^\s]*ref[\d^\s]*"		   	# reference number in format "REF...""	
+	crd = "(?i)[^\s]*crd[\d^\s]*"		   	# credit number in format "CRD..."		
 	# num = "[^\s]*\d\d\d\d+[^\s]*"
 
 	new_list = []
@@ -122,9 +123,22 @@ def remove_numbers_mixed_alphanumerics(memos_list):
 	return L
 
 alg_14 = remove_numbers_mixed_alphanumerics(memos_list_wo_date)
-pprint.pprint(alg_14)
-print(len(alg_14))
 
 
+# algorithm 10
+def return_and_remove_location(memos_list):
+	new_memos, location_dict = list(), dict()
+	G = GeoExtraction()
+	count = 0
+	for m in memos_list:
+		l = G.extract_location(m)
+		new_m = G.remove_location(m)
+		new_memos.append(m)
+		location_dict[new_m] = l
+		print(count)
+		count+=1
 
+	return new_memos, location_dict
 
+new_m , location_dict = return_and_remove_location(memos_list_wo_date)
+print(location_dict)
