@@ -54,17 +54,17 @@ def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
     # !!! double repeated algo takes precedence as mre effective
     # !!! meaningless alphanumeric chains, dates, locations, common words (debit) need to be removed first
 def analyze_pattern8(memos_list, vendors_list, memo_to_vdendor_dict):
+    name_list = []
     for x in range(len(memos_list)):
-        name_list = []
         if memos_list[x].count('*') == 1:
-            name = memos_list[x][memos_list[x].find('*'):]
-            memos_list[x].replace(name, '')
+            name = memos_list[x][memos_list[x].find('*')+1:]
             name_list.append(name)
+            memos_list[x].replace(name, '')
     return(memos_list, name_list)
 
-'''
+
     # 10a. Abbreviations >> Full Name
-    abbv_to_name_dict = {}
+def analyze_pattern10a(memos_list, vendors_list, memo_to_vdendor_dict):
     with open("Abbreviation Patterns - Sheet4.csv", 'r') as abbvfile:
         abbv = csv.reader(abbvfile)
         next(abbv)
@@ -83,8 +83,10 @@ def analyze_pattern8(memos_list, vendors_list, memo_to_vdendor_dict):
                     #print(sorted_list[x+1])
 
     return(1)
+analyze_pattern8(memos_list, vendors_list, memo_to_vendor_dict)
 '''
 analyze_pattern12(memos_list, vendors_list, memo_to_vendor_dict)
 analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
 #print(sorted_list)
 #print(sorted_list[129])
+'''
