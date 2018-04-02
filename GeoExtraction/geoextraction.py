@@ -74,14 +74,13 @@ class GeoExtraction:
             if re.search(pattern1 + "|" + pattern2 + "|" + pattern3 + "|" + pattern4, s):
                 location["county"].add(county)
 
-        # for i, city in enumerate(self.city_aliases):
-        #     pattern1 = "(?i)[\s\W]+" + city + "$"
-        #     pattern2 = "(?i)^" + city + "$"
-        #     pattern3 = "(?i)^" + city + "[\s\W]+"
-        #     pattern4 = "(?i)[\s\W]+" + city + "[\s\W]+"
-        #     if re.search(pattern1 + "|" + pattern2 + "|" + pattern3 + "|" + pattern4, s):
-        #         print(city)
-        #         location["city"].add(self.cities[i])
+        for i, city in enumerate(self.city_aliases):
+            pattern1 = "(?i)[\s\W]+" + city + "$"
+            pattern2 = "(?i)^" + city + "$"
+            pattern3 = "(?i)^" + city + "[\s\W]+"
+            pattern4 = "(?i)[\s\W]+" + city + "[\s\W]+"
+            if re.search(pattern1 + "|" + pattern2 + "|" + pattern3 + "|" + pattern4, s):
+                location["city"].add(self.cities[i])
 
         if location:
             return location
@@ -125,8 +124,7 @@ class GeoExtraction:
 
         return s
 
-G = GeoExtraction()
-print(G.extract_location("KESSLER WINES & SPIRIT   NEW YORK     NY"))
+
 
 
 
