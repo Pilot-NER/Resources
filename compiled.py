@@ -12,20 +12,17 @@ vendors_list = []
 
 # dictionary
 memo_to_vendor_dict = {}
-
 with open("Sample memos - memos.csv", 'r') as memofile:
     memo = csv.reader(memofile)
     next(memo)  # skip the first line
     for row in memo:
         memos_list.append(row[MEMO_STRING])  # lists of memo (exclude vendors)
         vendors_list.append(row[VENDOR].lstrip('[\'').rstrip('\']'))  # lists of vendors
-        memo_to_vendor_dict[row[MEMO_STRING]] = row[VENDOR].lstrip('[\'').rstrip(
-            '\']')  # dictionary of memos mapped to vendors
+        memo_to_vendor_dict[row[MEMO_STRING]] = row[VENDOR].lstrip('[\'').rstrip('\']')  # dictionary of memos mapped to vendors
 
 # algorithm functions
-
-# algorithm 1
-def analyze_pattern1(memos_list):
+def ext1(memos_list):
+    # anything in quotation marks = name
     match_list = []
     for x in range(len(memos_list)):
         matches=re.findall(r'\"(.+?)\"',memos_list[x])
@@ -34,8 +31,8 @@ def analyze_pattern1(memos_list):
             match_list.append(matches)
     return(memos_list,match_list)
 
-# algorithm 2
-def extract_repeated(memos_list):
+def ext2(memos_list):
+    # anything repeated twice = name
     names = []
     new_memos = []
     for memo in memos_list:
@@ -54,8 +51,8 @@ def extract_repeated(memos_list):
             new_memos.append(memo)
     return new_memos, names
 
-# algorithm 3
-def less_than_3(memos_list):
+def ext3(memos_list):
+    # memo length <=3 >> whole memo = name
     ans = list()
     L_removed = list()
     num_location = "[^\s]*\d\d\d[^\s]*|\sCA\s"  # numbers or "CA" california
@@ -68,8 +65,8 @@ def less_than_3(memos_list):
     memos_list = [m for i, m in enumerate(memos_list) if i not in L_removed]
     return memos_list, ans
 
-# algorithm 4: remove abbreviations such as debt car/credit card, ref, crd, dt number, Paypal, etc.
-def remove_abr(memos_list):
+def sim1(memos_list):
+    # remove financial shorthand
     for i, mem in enumerate(memos_list):
         # memos less than or equal to three words are left alone
         if len(mem.split()) <= 3:
@@ -81,8 +78,8 @@ def remove_abr(memos_list):
             memos_list[i] = mem
     return memos_list
 
-# algorithm 6/13
-def remove_numbers_mixed_alphanumerics(memos_list):
+def sim2(memos_list):
+    #reomve mixed alphanumerics
     num = "[^s]*\d\d\d\d\d+[^s]*"  # more than 5 numbers
     alt_alphanum = "(?i)[^s][a-z]+\d+\w*[^s]"  # alternating numbers and alphabets (alphabets come first)
     alt_alphanum_2 = "(?i)[^s]\d+[a-z]+\w*[^s]"  # alternating numbers and alphabets (numbers come first)
@@ -98,18 +95,8 @@ def remove_numbers_mixed_alphanumerics(memos_list):
             L.append(m)
     return L
 
-# algorithm 8
-def analyze_pattern8(memos_list):
-    name_list = []
-    for x in range(len(memos_list)):
-        if memos_list[x].count('*') == 1:
-            name = memos_list[x][memos_list[x].find('*')+1:]
-            name_list.append(name)
-            memos_list[x].replace(name, '')
-    return(memos_list, name_list)
-
-# algorithm 9
-def before_keywords(memos_list):
+def ext4(memos_list):
+    # word before company suffixes = name
     keywords = ["(?i)\sinc.\s", "(?i)\sLLC\s", "(?i)\sCO\s", "(?i)\sLimited\s", "(?i)\sINC\s", "(?i)\sCorporation\s",
                 "(?i)\s.com\s", "(?i)\s.net\s"]
     ans = list()
@@ -124,8 +111,8 @@ def before_keywords(memos_list):
 
     return new_memos, ans
 
-# algorithm 10
-def return_and_remove_location(memos_list):
+def pend1(memos_list):
+    # extract location terms
     new_memos, location_dict = list(), dict()
     G = GeoExtraction()
     count = 0
@@ -138,9 +125,8 @@ def return_and_remove_location(memos_list):
         count += 1
     return new_memos, location_dict
 
-# algorithm 11
-def remove_date_ref_Crd(memos_list):
-    # remove the date from the string (assume format - "MM/DD")
+def sim3(memos_list):
+    # remove the date/ref/crd number (assumed format of date - "MM/DD")
     date = "[^\s]*\d\d/\d\d[^\s]*"  # date
     ref = "(?i)[^\s]*ref[\d^\s]*"  # reference number in format "REF...""
     crd = "(?i)[^\s]*crd[\d^\s]*"  # credit number in format "CRD..."
@@ -159,9 +145,8 @@ def remove_date_ref_Crd(memos_list):
         new_list.append(tmp)
     return new_list
 
-# algorithm 12
-def analyze_pattern12(memos_list):
-    # 12. removing transfers
+def sim4(memos_list):
+    # ignore online/bank transfers
     for x in memos_list:
         if 'internet transfer' in x.lower():
             del memos_list[memos_list.index(x)]
@@ -170,6 +155,8 @@ def analyze_pattern12(memos_list):
             del memos_list[memos_list.index(x)]
     return(memos_list)
 
+'''
+memos_list_wo_date = remove_date_ref_Crd(memos_list)
 alg_14 = remove_numbers_mixed_alphanumerics(memos_list_wo_date)
 alg_4 = remove_abr(memos_list)
 alg_6 = remove_numbers_mixed_alphanumerics(alg_4)
@@ -191,9 +178,5 @@ print(ans2)
 print(ans3)
 print(ans4)
 print(ans5)
-<<<<<<< HEAD
-print(alg_2)
-=======
 print(set(alg_2))
-
->>>>>>> fbe150a2db6948dc51c3c594d0b5788fc18dc5d5
+'''

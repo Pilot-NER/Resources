@@ -212,9 +212,4 @@ print(ans2)
 print(ans3)
 print(ans4)
 print(ans5)
-<<<<<<< HEAD
-print(alg_2)
-=======
 print(set(alg_2))
-
->>>>>>> fbe150a2db6948dc51c3c594d0b5788fc18dc5d5
