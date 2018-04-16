@@ -212,4 +212,4 @@ print(ans2)
 print(ans3)
 print(ans4)
 print(ans5)
-
+print(alg_2)

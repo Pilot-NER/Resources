@@ -81,10 +81,9 @@ def analyze_pattern10a(memos_list, vendors_list, memo_to_vdendor_dict):
                     #print(sorted_list[x+1])
 
     return(1)
-analyze_pattern8(memos_list, vendors_list, memo_to_vendor_dict)
-'''
-analyze_pattern12(memos_list, vendors_list, memo_to_vendor_dict)
-analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
+#analyze_pattern8(memos_list, vendors_list, memo_to_vendor_dict)
+
+#analyze_pattern12(memos_list, vendors_list, memo_to_vendor_dict)
+#analyze_pattern1(memos_list, vendors_list, memo_to_vendor_dict)
 #print(sorted_list)
 #print(sorted_list[129])
-'''
