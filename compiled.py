@@ -59,20 +59,38 @@ def ext2(data_list):
 
 def ext3(memos_list):
     # memo length <=3 >> whole memo = name
-    ans = list()
-    L_removed = list()
+    name_list = []
+    L_removed = []
     num_location = "[^\s]*\d\d\d[^\s]*|\sCA\s"  # numbers or "CA" california
     for i, m in enumerate(memos_list):
         tmp = m.split()
         if len(tmp) <= 3:
             tmp_s = re.sub(num_location, "", m)
-            ans.append(tmp_s.lstrip().rstrip())
+            name_list.append(tmp_s.lstrip().rstrip())
             L_removed.append(i)
+        else:
+            name_list.append('X')
     memos_list = [m for i, m in enumerate(memos_list) if i not in L_removed]
-    return memos_list, ans
+    return(name_list)
 
 def sim1(memos_list):
+    sim_list = []
     # remove financial shorthand
+    for i, mem in enumerate(memos_list):
+        # memos less than or equal to three words are left alone
+        if len(mem.split()) <= 3:
+            sim_list.append('pass')
+        else:
+            #remove abbreviations such as debt car/credit card, ref, crd, dt number, Paypal, etc.
+            shorthands = "(?i)debit card|credit card|debit|credit|card|crd|ref|cashier check purchase|paypal| NY | New York | Las Vegas | NV | San Francisco | SF | San Francis |San Mateo | San Jose | Port Melbourn | CA | JAMAICA | Sydney | NS | Log Angeles | AU | Surry Hills | Singapore | SG "
+            memN = re.sub(' +',' ',re.sub(shorthands, '', mem))
+            if mem == memN:
+                sim_list.append('X')
+            else:
+                sim_list.append(memN)
+    return sim_list
+
+def sim1x(memos_list):
     for i, mem in enumerate(memos_list):
         # memos less than or equal to three words are left alone
         if len(mem.split()) <= 3:
@@ -98,6 +116,24 @@ def sim2(memos_list):
         if tmp:
             L.append(tmp)
         else:
+            L.append('X')
+    return L
+
+def sim2x(memos_list):
+    num = "[^s]*\d\d\d\d\d+[^s]*"  # more than 5 numbers
+    alt_alphanum = "(?i)[^s][a-z]+\d+\w*[^s]"  # alternating numbers and alphabets (alphabets come first)
+    alt_alphanum_2 = "(?i)[^s]\d+[a-z]+\w*[^s]"  # alternating numbers and alphabets (numbers come first)
+
+    L = list()
+
+    for m in memos_list:
+        tmp = re.split(num + "|" + alt_alphanum + "|" + alt_alphanum_2, m)
+        tmp = [x.lstrip().rstrip() for x in tmp]
+        tmp = ' '.join(tmp).lstrip().rstrip()
+        # print(m, tmp)
+        if tmp:
+            L.append(tmp)
+        else:
             L.append(m)
     return L
 
@@ -114,8 +150,8 @@ def ext4(memos_list):
                 ans.append(tmp[0] + " " + k[6:-2])
             else:
                 new_memos.append(m)
-
-    return new_memos, ans
+                ans.append('X')
+    return ans
 
 def pend1(memos_list):
     # extract location terms
@@ -148,11 +184,52 @@ def sim3(memos_list):
         tmp = re.split(crd, tmp)
         tmp = [x.lstrip().rstrip() for x in tmp]
         tmp = ' '.join(tmp).lstrip().rstrip()
+        if tmp == memo:
+            new_list.append('X')
+        else:
+            new_list.append(tmp)
+    return new_list
+
+def sim3x(memos_list):
+    # remove the date from the string (assume format - "MM/DD")
+
+    date = "[^\s]*\d\d/\d\d[^\s]*"  # date
+    ref = "(?i)[^\s]*ref[\d^\s]*"  # reference number in format "REF...""
+    crd = "(?i)[^\s]*crd[\d^\s]*"  # credit number in format "CRD..."
+    # num = "[^\s]*\d\d\d\d+[^\s]*"
+
+    new_list = []
+    for i, memo in enumerate(memos_list):
+        tmp = re.split(date, memo)
+        tmp = [x.lstrip().rstrip() for x in tmp]
+        tmp = ' '.join(tmp).lstrip().rstrip()
+
+        tmp = re.split(ref, tmp)
+        tmp = [x.lstrip().rstrip() for x in tmp]
+        tmp = ' '.join(tmp).lstrip().rstrip()
+
+        tmp = re.split(crd, tmp)
+        tmp = [x.lstrip().rstrip() for x in tmp]
+        tmp = ' '.join(tmp).lstrip().rstrip()
+
         new_list.append(tmp)
+
     return new_list
 
 def sim4(memos_list):
     # ignore online/bank transfers
+    sim_list = []
+    for x in memos_list:
+        if 'internet transfer' in x.lower():
+            sim_list.append('Rm')
+        elif 'online transfer' in x.lower():
+            sim_list.append('Rm')
+        else:
+            sim_list.append('X')
+    return(sim_list)
+
+def sim4x(memos_list):
+    # 12. removing transfers
     for x in memos_list:
         if 'internet transfer' in x.lower():
             del memos_list[memos_list.index(x)]
@@ -162,16 +239,24 @@ def sim4(memos_list):
     return(memos_list)
 
 # testing
+
 ori = ['memo']+memos_list
-ext1 = ['ext1']+ext1(memos_list)
-ext2 = ['ext2']+ext2(memos_list)
+simp_list = sim1x(sim2x(sim3x(sim4x(ori))))
+sim1 = ['sim1']+sim1(memos_list)
+sim2 = ['sim2']+sim2(memos_list)
+sim3 = ['sim3']+sim3(memos_list)
+sim4 = ['sim4']+sim4(memos_list)
+ext1 = ['ext1']+ext1(simp_list)
+ext2 = ['ext2']+ext2(simp_list)
+ext3 = ['ext3']+ext3(simp_list)
+ext4 = ['ext4']+ext4(simp_list)
 
 csvfile = 'tracking.csv'
 
 with open(csvfile, "w") as output:
     writer = csv.writer(output, lineterminator='\n')
     for x in range(len(ori)):
-        writer.writerow([ori[x],ext1[x],ext2[x]])
+        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],ext1[x],ext2[x],ext3[x],ext4[x]])
 
 '''
 def test(data_list):
