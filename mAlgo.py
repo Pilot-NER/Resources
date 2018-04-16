@@ -45,7 +45,7 @@ def analyze_pattern1(memos_list, vendors_list, memo_to_vdendor_dict):
     for x in range(len(memos_list)):
         matches=re.findall(r'\"(.+?)\"',memos_list[x])
         if matches != [] and len(matches) == 1:
-            memos_list[x].replace(matches, '')
+            memos_list[x].replace(matches[0], '')
             match_list.append(matches)
     return(memos_list,match_list)
 
@@ -75,8 +75,6 @@ def analyze_pattern10a(memos_list, vendors_list, memo_to_vdendor_dict):
     for x in range(len(memos_list)):
         for y in abbv_to_name_dict.keys():
             if y in memos_list[x].lower():
-                print(y)
-                print(memos_list[x])
                 if abbv_to_name_dict[y] != '':
                     #print(sorted_list[x+1])
                     sorted_list[x+1][0].replace(y,abbv_to_name_dict[y])
