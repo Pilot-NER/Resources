@@ -1,7 +1,7 @@
 import csv
 import re  # regex
 import pprint
-import numpy
+# import numpy as np
 from GeoExtraction.geoextraction import GeoExtraction
 
 MEMO_STRING = 0
@@ -25,50 +25,37 @@ with open("Sample memos - memos.csv", 'r') as memofile:
 results = memos_list
 
 # algorithm functions
-def ext1(data):
+def ext1(data_list):
     # anything in quotation marks = name
-    matches=re.findall(r'\"(.+?)\"',data)
-    if matches != [] and len(matches) == 1:
-        return([True, matches[0]])
-    else:
-        return([False])
-
-def ext2(data):
-    name =  ''
-    words = data.split()
-    counts = {}
-    for word in words:
-        if word not in counts:
-            counts[word] = 1
+    match_list = []
+    for x in range(len(memos_list)):
+        matches=re.findall(r'\"(.+?)\"',memos_list[x])
+        if matches != [] and len(matches) == 1:
+            memos_list[x].replace(matches[0], '')
+            match_list.append(matches)
         else:
-            counts[word] += 1
-        if counts[word] > 1:
-            name += ' ' + word
-    if not(name == ""):
-        return([True,name])
-    else:
-        return([False])
+            match_list.append('X')
+    return(match_list)
 
-    # anything repeated twice = name
-    names = []
-    new_memos = []
-    for memo in memos_list:
-        m = memo.split()
-        tmp_set = set()
-        tmp_str = ""
-        for c in m:
-            if c in tmp_set and c:
-                tmp_str += c
-                tmp_str += " "
+def ext2(data_list):
+# repeated words = name
+    rep_list = []
+    for data in data_list:
+        name =  ''
+        words = data.split()
+        counts = {}
+        for word in words:
+            if word not in counts:
+                counts[word] = 1
             else:
-                tmp_set.add(c)
-        if tmp_str:
-            print('y')
-            return([True,tmp_str.rstrip()])
-            #names.append(tmp_str.rstrip())
+                counts[word] += 1
+            if counts[word] > 1:
+                name += ' ' + word
+        if not(name == ""):
+            rep_list.append(name)
         else:
-            return([False])
-            #new_memos.append(memo)
+            rep_list.append('X')
+    return(rep_list)
 
 def ext3(memos_list):
     # memo length <=3 >> whole memo = name
@@ -175,8 +162,20 @@ def sim4(memos_list):
     return(memos_list)
 
 # testing
+ori = ['memo']+memos_list
+ext1 = ['ext1']+ext1(memos_list)
+ext2 = ['ext2']+ext2(memos_list)
 
+csvfile = 'tracking.csv'
+
+with open(csvfile, "w") as output:
+    writer = csv.writer(output, lineterminator='\n')
+    for x in range(len(ori)):
+        writer.writerow([ori[x],ext1[x],ext2[x]])
+
+'''
 def test(data_list):
+    ind_col = ['memo'] + data_list
     ext2_col = ['ext2']
     for memo in data_list:
         res = ext2(memo)
@@ -184,34 +183,5 @@ def test(data_list):
             ext2_col.append(res[1])
         else:
             ext2_col.append('X')
-    print(ext2_col)
-    return(ext2_col)
-
-print(memos_list)
-test(memos_list)
-
-'''
-memos_list_wo_date = remove_date_ref_Crd(memos_list)
-alg_14 = remove_numbers_mixed_alphanumerics(memos_list_wo_date)
-alg_4 = remove_abr(memos_list)
-alg_6 = remove_numbers_mixed_alphanumerics(alg_4)
-alg_11 = remove_date_ref_Crd(alg_6)
-alg_12 = analyze_pattern12(memos_list)
-print(len(alg_4))  # == 338
-print(len(alg_6))  # == 338
-print(len(alg_11)) # == 338
-
-
-
-alg_3, ans1 = less_than_3(alg_12)
-alg_9, ans2 = before_keywords(alg_3)
-alg_1, ans3 = analyze_pattern1(alg_9)
-alg_8, ans4 = analyze_pattern8(alg_1)
-alg_2, ans5 = extract_repeated(alg_8)
-print(ans1)
-print(ans2)
-print(ans3)
-print(ans4)
-print(ans5)
-print(set(alg_2))
+    return(np.column_stack((np.array(ind_col),np.array(ext2_col))))
 '''
