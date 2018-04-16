@@ -1,6 +1,7 @@
 import csv
 import re  # regex
 import pprint
+import numpy
 from GeoExtraction.geoextraction import GeoExtraction
 
 MEMO_STRING = 0
@@ -20,18 +21,34 @@ with open("Sample memos - memos.csv", 'r') as memofile:
         vendors_list.append(row[VENDOR].lstrip('[\'').rstrip('\']'))  # lists of vendors
         memo_to_vendor_dict[row[MEMO_STRING]] = row[VENDOR].lstrip('[\'').rstrip('\']')  # dictionary of memos mapped to vendors
 
-# algorithm functions
-def ext1(memos_list):
-    # anything in quotation marks = name
-    match_list = []
-    for x in range(len(memos_list)):
-        matches=re.findall(r'\"(.+?)\"',memos_list[x])
-        if matches != [] and len(matches) == 1:
-            memos_list[x].replace(matches[0], '')
-            match_list.append(matches)
-    return(memos_list,match_list)
+# making results list
+results = memos_list
 
-def ext2(memos_list):
+# algorithm functions
+def ext1(data):
+    # anything in quotation marks = name
+    matches=re.findall(r'\"(.+?)\"',data)
+    if matches != [] and len(matches) == 1:
+        return([True, matches[0]])
+    else:
+        return([False])
+
+def ext2(data):
+    name =  ''
+    words = data.split()
+    counts = {}
+    for word in words:
+        if word not in counts:
+            counts[word] = 1
+        else:
+            counts[word] += 1
+        if counts[word] > 1:
+            name += ' ' + word
+    if not(name == ""):
+        return([True,name])
+    else:
+        return([False])
+
     # anything repeated twice = name
     names = []
     new_memos = []
@@ -46,10 +63,12 @@ def ext2(memos_list):
             else:
                 tmp_set.add(c)
         if tmp_str:
-            names.append(tmp_str.rstrip())
+            print('y')
+            return([True,tmp_str.rstrip()])
+            #names.append(tmp_str.rstrip())
         else:
-            new_memos.append(memo)
-    return new_memos, names
+            return([False])
+            #new_memos.append(memo)
 
 def ext3(memos_list):
     # memo length <=3 >> whole memo = name
@@ -154,6 +173,22 @@ def sim4(memos_list):
         elif 'online transfer' in x.lower():
             del memos_list[memos_list.index(x)]
     return(memos_list)
+
+# testing
+
+def test(data_list):
+    ext2_col = ['ext2']
+    for memo in data_list:
+        res = ext2(memo)
+        if res[0]:
+            ext2_col.append(res[1])
+        else:
+            ext2_col.append('X')
+    print(ext2_col)
+    return(ext2_col)
+
+print(memos_list)
+test(memos_list)
 
 '''
 memos_list_wo_date = remove_date_ref_Crd(memos_list)
