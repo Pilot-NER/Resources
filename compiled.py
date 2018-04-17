@@ -38,7 +38,7 @@ def ext1(data_list):
         matches=re.findall(r'\"(.+?)\"',memos_list[x])
         if matches != [] and len(matches) == 1:
             memos_list[x].replace(matches[0], '')
-            match_list.append(matches)
+            match_list.append(matches[0])
         else:
             match_list.append('X')
     return(match_list)
@@ -55,8 +55,8 @@ def ext2(data_list):
                 counts[word] = 1
             else:
                 counts[word] += 1
-            if counts[word] > 1:
-                name += ' ' + word
+                if counts[word] > 1:
+                    name += word + ' '
         if not(name == ""):
             rep_list.append(name)
         else:
@@ -146,18 +146,17 @@ def sim2x(memos_list):
 
 def ext4(memos_list):
     # word before company suffixes = name
-    keywords = ["(?i)\sinc.\s", "(?i)\sLLC\s", "(?i)\sCO\s", "(?i)\sLimited\s", "(?i)\sINC\s", "(?i)\sCorporation\s",
-                "(?i)\s.com\s", "(?i)\s.net\s"]
+    keywords = "(?i)\sinc.\s|(?i)\sLLC\s|(?i)\sCO\s|(?i)\sLimited\s|(?i)\sINC\s|(?i)\sCorporation\s|(?i)\s.com\s|(?i)\s.net\s"
+    k = keywords.split("|")
     ans = list()
     new_memos = list()
     for m in memos_list:
-        for k in keywords:
-            tmp = re.split(k, m)
-            if len(tmp) > 1 and (m not in ans or (m in ans and len(tmp[0]) < len(ans[m]))):
-                ans.append(tmp[0] + " " + k[6:-2])
-            else:
-                new_memos.append(m)
-                ans.append('X')
+        tmp = re.split(keywords, m)
+        if len(tmp) > 1:
+            ans.append(tmp[0])
+        else:
+            new_memos.append(m)
+            ans.append('X')
     return ans
 
 def pend1(memos_list):
@@ -250,6 +249,7 @@ def sim4x(memos_list):
 
 # testing
 
+# creating output lists for each pattern
 ori = ['memo']+memos_list
 simp_list = sim1x(sim2x(sim3x(sim4x(ori))))
 simp_list[0] = "simp"
@@ -257,35 +257,12 @@ sim1 = ['sim1']+sim1(memos_list)
 sim2 = ['sim2']+sim2(memos_list)
 sim3 = ['sim3']+sim3(memos_list)
 sim4 = ['sim4']+sim4(memos_list)
-ext1 = ['ext1']+ext1(simp_list)
-ext2 = ['ext2']+ext2(simp_list)
-ext3 = ['ext3']+ext3(simp_list)
-ext4 = ['ext4']+ext4(simp_list)
+ext1 = ['ext1']+ext1(simp_list[1:])
+ext2 = ['ext2']+ext2(simp_list[1:])
+ext3 = ['ext3']+ext3(simp_list[1:])
+ext4 = ['ext4']+ext4(simp_list[1:])
 
-'''
-print(len(memos_list))
-print(len(ori))
-print(len(simp_list))
-print(len(sim1))
-print(len(sim2))
-print(len(sim3))
-print(len(sim4))
-print(len(ext1))
-print(len(ext2))
-print(len(ext3))
-print(len(ext4))
-'''
-
-print(memos_list)
-
-testfile = 'test.csv'
-# checking for no extraction
-
-with open(testfile, "w") as output:
-    writer = csv.writer(output, lineterminator='\n')
-    for x in range(len(ori)):
-        writer.writerow([ori[x],simp_list[x]])
-
+# creating output list for failed extractions
 extF = ['failed']
 for x in range(len(ori)):
     if ext1[x] == ext2[x] == ext3[x] == ext4[x] == 'X':
@@ -293,35 +270,43 @@ for x in range(len(ori)):
     else:
         extF.append('extracted')
 
-csvfile = 'tracking.csv'
-
-with open(csvfile, "w") as output:
-    writer = csv.writer(output, lineterminator='\n')
-    for x in range(len(ori)):
-        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],simp_list[x],ext1[x],ext2[x],ext3[x],ext4[x],extF[x]])
-
+# checking accuracy for each extraction (ignores lower/upper case diff)
 def check_accuracy(ans_list,my_list):
     acc_list = []
     for x in range(len(ans_list)):
         acc_list.append(similar(ans_list[x],my_list[x]))
     return(acc_list)
 
-#print(similar("apple","appel"))
-#print(similar("apple","mango"))
-#print(check_accuracy(vendors_list,ext2[1:]))
-#print(vendors_list)
-#print(ext2[1:])
-#print(len(vendors_list))
-#print(len(ext2[1:]))
+right_list = ['vendors'] + vendors_list
+right_list = [x.lower() for x in right_list]
+ext1a = [x.lower() for x in ext1]
+ext2a = [x.lower() for x in ext2]
+ext3a = [x.lower() for x in ext3]
+ext4a = [x.lower() for x in ext4]
 
+acc1_list = check_accuracy(right_list, ext1a)
+acc1_list[0] = 'accuracy'
 
-def test(data_list):
-    ind_col = ['memo'] + data_list
-    ext2_col = ['ext2']
-    for memo in data_list:
-        res = ext2(memo)
-        if res[0]:
-            ext2_col.append(res[1])
-        else:
-            ext2_col.append('X')
-    return(np.column_stack((np.array(ind_col),np.array(ext2_col))))
+acc2_list = check_accuracy(right_list, ext2a)
+acc2_list[0] = 'accuracy'
+
+acc3_list = check_accuracy(right_list, ext3a)
+acc3_list[0] = 'accuracy'
+
+acc4_list = check_accuracy(right_list, ext4a)
+acc4_list[0] = 'accuracy'
+# writing to tracking file
+
+csvfile = 'tracking.csv'
+
+with open(csvfile, "w") as output:
+    writer = csv.writer(output, lineterminator='\n')
+    for x in range(len(ori)):
+        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],simp_list[x],right_list[x],ext1[x],acc1_list[x],ext2[x],acc2_list[x],ext3[x],acc3_list[x],ext4[x],acc4_list[x],extF[x]])
+
+testfile = 'test.csv'
+
+with open(testfile, "w") as output:
+    writer = csv.writer(output, lineterminator='\n')
+    for x in range(len(ori)):
+        writer.writerow([ori[x],simp_list[x]])
