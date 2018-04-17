@@ -3,6 +3,7 @@ import re  # regex
 import pprint
 # import numpy as np
 from GeoExtraction.geoextraction import GeoExtraction
+from difflib import SequenceMatcher
 
 MEMO_STRING = 0
 VENDOR = 1
@@ -23,6 +24,11 @@ with open("Sample memos - memos.csv", 'r') as memofile:
 
 # making results list
 results = memos_list
+
+
+# checking similarity
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
 # algorithm functions
 def ext1(data_list):
@@ -91,16 +97,17 @@ def sim1(memos_list):
     return sim_list
 
 def sim1x(memos_list):
+    changed_list = []
     for i, mem in enumerate(memos_list):
         # memos less than or equal to three words are left alone
         if len(mem.split()) <= 3:
-            pass ##### or would it be break?
+            changed_list.append(mem)
         else:
             #remove abbreviations such as debt car/credit card, ref, crd, dt number, Paypal, etc.
             shorthands = "(?i)debit card|credit card|debit|credit|card|crd|ref|cashier check purchase|paypal| NY | New York | Las Vegas | NV | San Francisco | SF | San Francis |San Mateo | San Jose | Port Melbourn | CA | JAMAICA | Sydney | NS | Log Angeles | AU | Surry Hills | Singapore | SG "
             mem = re.sub(' +',' ',re.sub(shorthands, '', mem))
-            memos_list[i] = mem
-    return memos_list
+            changed_list.append(mem)
+    return changed_list
 
 def sim2(memos_list):
     #reomve mixed alphanumerics
@@ -230,18 +237,22 @@ def sim4(memos_list):
 
 def sim4x(memos_list):
     # 12. removing transfers
-    for x in memos_list:
-        if 'internet transfer' in x.lower():
-            del memos_list[memos_list.index(x)]
+    changed_list = []
+    for x in range(len(memos_list)):
+        if 'internet transfer' in memos_list[x].lower():
+            changed_list.append('X')
 
-        elif 'online transfer' in x.lower():
-            del memos_list[memos_list.index(x)]
-    return(memos_list)
+        elif 'online transfer' in memos_list[x].lower():
+            changed_list.append('X')
+        else:
+            changed_list.append(memos_list[x])
+    return(changed_list)
 
 # testing
 
 ori = ['memo']+memos_list
 simp_list = sim1x(sim2x(sim3x(sim4x(ori))))
+simp_list[0] = "simp"
 sim1 = ['sim1']+sim1(memos_list)
 sim2 = ['sim2']+sim2(memos_list)
 sim3 = ['sim3']+sim3(memos_list)
@@ -251,14 +262,59 @@ ext2 = ['ext2']+ext2(simp_list)
 ext3 = ['ext3']+ext3(simp_list)
 ext4 = ['ext4']+ext4(simp_list)
 
+'''
+print(len(memos_list))
+print(len(ori))
+print(len(simp_list))
+print(len(sim1))
+print(len(sim2))
+print(len(sim3))
+print(len(sim4))
+print(len(ext1))
+print(len(ext2))
+print(len(ext3))
+print(len(ext4))
+'''
+
+print(memos_list)
+
+testfile = 'test.csv'
+# checking for no extraction
+
+with open(testfile, "w") as output:
+    writer = csv.writer(output, lineterminator='\n')
+    for x in range(len(ori)):
+        writer.writerow([ori[x],simp_list[x]])
+
+extF = ['failed']
+for x in range(len(ori)):
+    if ext1[x] == ext2[x] == ext3[x] == ext4[x] == 'X':
+        extF.append('X')
+    else:
+        extF.append('extracted')
+
 csvfile = 'tracking.csv'
 
 with open(csvfile, "w") as output:
     writer = csv.writer(output, lineterminator='\n')
     for x in range(len(ori)):
-        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],ext1[x],ext2[x],ext3[x],ext4[x]])
+        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],simp_list[x],ext1[x],ext2[x],ext3[x],ext4[x],extF[x]])
 
-'''
+def check_accuracy(ans_list,my_list):
+    acc_list = []
+    for x in range(len(ans_list)):
+        acc_list.append(similar(ans_list[x],my_list[x]))
+    return(acc_list)
+
+#print(similar("apple","appel"))
+#print(similar("apple","mango"))
+#print(check_accuracy(vendors_list,ext2[1:]))
+#print(vendors_list)
+#print(ext2[1:])
+#print(len(vendors_list))
+#print(len(ext2[1:]))
+
+
 def test(data_list):
     ind_col = ['memo'] + data_list
     ext2_col = ['ext2']
@@ -269,4 +325,3 @@ def test(data_list):
         else:
             ext2_col.append('X')
     return(np.column_stack((np.array(ind_col),np.array(ext2_col))))
-'''
