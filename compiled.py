@@ -274,7 +274,10 @@ for x in range(len(ori)):
 def check_accuracy(ans_list,my_list):
     acc_list = []
     for x in range(len(ans_list)):
-        acc_list.append(similar(ans_list[x],my_list[x]))
+        if ans_list[x] == 'X':
+            acc_list.append(0)
+        else:
+            acc_list.append(similar(ans_list[x],my_list[x]))
     return(acc_list)
 
 right_list = ['vendors'] + vendors_list
@@ -295,6 +298,34 @@ acc3_list[0] = 'accuracy'
 
 acc4_list = check_accuracy(right_list, ext4a)
 acc4_list[0] = 'accuracy'
+
+# extraction firing process
+def extract(ori,ext1,ext2,ext3,ext4):
+    final_list = []
+    noExt_list = []
+    for x in range(len(ext1)):
+        if ext1[x] != 'X':
+            final_list.append(ext1[x])
+        elif ext4[x] != 'X':
+            final_list.append(ext4[x])
+        elif ext2[x] != 'X':
+            final_list.append(ext2[x])
+        elif ext3[x] != 'X':
+            final_list.append(ext3[x])
+        else:
+            final_list.append('X')
+            noExt_list.append(ori[x])
+    return(final_list,noExt_list)
+
+final_output = extract(ext1,ext2,ext3,ext4)[0]
+noExt_list = extract(ext1,ext2,ext3,ext4)[1]
+final_output[0] = 'output'
+
+extfa = [x.lower() for x in final_output]
+
+acc_list = check_accuracy(right_list, extfa)
+acc_list[0] = 'accuracy'
+
 # writing to tracking file
 
 csvfile = 'tracking.csv'
@@ -302,7 +333,7 @@ csvfile = 'tracking.csv'
 with open(csvfile, "w") as output:
     writer = csv.writer(output, lineterminator='\n')
     for x in range(len(ori)):
-        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],simp_list[x],right_list[x],ext1[x],acc1_list[x],ext2[x],acc2_list[x],ext3[x],acc3_list[x],ext4[x],acc4_list[x],extF[x]])
+        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],simp_list[x],right_list[x],ext1[x],acc1_list[x],ext2[x],acc2_list[x],ext3[x],acc3_list[x],ext4[x],acc4_list[x],extF[x],final_output[x],acc_list[x]])
 
 testfile = 'test.csv'
 
