@@ -40,7 +40,7 @@ def ext1(data_list):
             memos_list[x].replace(matches[0], '')
             match_list.append(matches[0])
         else:
-            match_list.append('X')
+            match_list.append('')
     return(match_list)
 
 def ext2(data_list):
@@ -60,7 +60,7 @@ def ext2(data_list):
         if not(name == ""):
             rep_list.append(name)
         else:
-            rep_list.append('X')
+            rep_list.append('')
     return(rep_list)
 
 def ext3(memos_list):
@@ -75,7 +75,7 @@ def ext3(memos_list):
             name_list.append(tmp_s.lstrip().rstrip())
             L_removed.append(i)
         else:
-            name_list.append('X')
+            name_list.append('')
     memos_list = [m for i, m in enumerate(memos_list) if i not in L_removed]
     return(name_list)
 
@@ -91,7 +91,7 @@ def sim1(memos_list):
             shorthands = "(?i)debit card|credit card|debit|credit|card|crd|ref|cashier check purchase|paypal| NY | New York | Las Vegas | NV | San Francisco | SF | San Francis |San Mateo | San Jose | Port Melbourn | CA | JAMAICA | Sydney | NS | Log Angeles | AU | Surry Hills | Singapore | SG "
             memN = re.sub(' +',' ',re.sub(shorthands, '', mem))
             if mem == memN:
-                sim_list.append('X')
+                sim_list.append('')
             else:
                 sim_list.append(memN)
     return sim_list
@@ -123,7 +123,7 @@ def sim2(memos_list):
         if tmp:
             L.append(tmp)
         else:
-            L.append('X')
+            L.append('')
     return L
 
 def sim2x(memos_list):
@@ -156,7 +156,7 @@ def ext4(memos_list):
             ans.append(tmp[0])
         else:
             new_memos.append(m)
-            ans.append('X')
+            ans.append('')
     return ans
 
 def pend1(memos_list):
@@ -191,7 +191,7 @@ def sim3(memos_list):
         tmp = [x.lstrip().rstrip() for x in tmp]
         tmp = ' '.join(tmp).lstrip().rstrip()
         if tmp == memo:
-            new_list.append('X')
+            new_list.append('')
         else:
             new_list.append(tmp)
     return new_list
@@ -231,7 +231,7 @@ def sim4(memos_list):
         elif 'online transfer' in x.lower():
             sim_list.append('Rm')
         else:
-            sim_list.append('X')
+            sim_list.append('')
     return(sim_list)
 
 def sim4x(memos_list):
@@ -239,45 +239,99 @@ def sim4x(memos_list):
     changed_list = []
     for x in range(len(memos_list)):
         if 'internet transfer' in memos_list[x].lower():
-            changed_list.append('X')
+            changed_list.append('')
 
         elif 'online transfer' in memos_list[x].lower():
-            changed_list.append('X')
+            changed_list.append('')
         else:
             changed_list.append(memos_list[x])
     return(changed_list)
 
+def sim5(memos_list):
+    # ignore online/bank transfers
+    sim_list = []
+    for x in range(len(memos_list)):
+        if '*' in memos_list[x]:
+            sim_list.append(memos_list[x][memos_list[x].rfind('*')+1:])
+        else:
+            sim_list.append('')
+    return(sim_list)
+
+def sim5x(memos_list):
+    # ignore online/bank transfers
+    sim_list = []
+    for x in range(len(memos_list)):
+        if '*' in memos_list[x]:
+            sim_list.append(memos_list[x][memos_list[x].rfind('*')+1:])
+        else:
+            sim_list.append(memos_list[x])
+    return(sim_list)
+
+def sim6(memos_list):
+    sim_list = []
+    a = ['"',',','.']
+    for x in range(len(memos_list)):
+        if any(i in memos_list[x] for i in a):
+            temp = memos_list[x].replace('"', "")
+            temp = memos_list[x].replace(',', "")
+            sim_list.append(temp)
+        else:
+            sim_list.append('')
+    return(sim_list)
+
+def sim6x(memos_list):
+    sim_list = []
+    a = ['"',',','.']
+    for x in range(len(memos_list)):
+        if any(i in memos_list[x] for i in a):
+            temp = memos_list[x].replace('"', "")
+            temp = memos_list[x].replace(',', "")
+            sim_list.append(temp)
+        else:
+            sim_list.append(memos_list[x])
+    return(sim_list)
 # testing
+
 
 # creating output lists for each pattern
 ori = ['memo']+memos_list
-simp_list = sim1x(sim2x(sim3x(sim4x(ori))))
+simp_list = sim1x(sim2x(sim3x(sim4x(sim5x(sim6x(ori))))))
 simp_list[0] = "simp"
 sim1 = ['sim1']+sim1(memos_list)
 sim2 = ['sim2']+sim2(memos_list)
 sim3 = ['sim3']+sim3(memos_list)
 sim4 = ['sim4']+sim4(memos_list)
+sim5 = ['sim5']+sim5(memos_list)
+sim6 = ['sim6']+sim6(memos_list)
 ext1 = ['ext1']+ext1(simp_list[1:])
 ext2 = ['ext2']+ext2(simp_list[1:])
 ext3 = ['ext3']+ext3(simp_list[1:])
 ext4 = ['ext4']+ext4(simp_list[1:])
 
+testfile = 'test.csv'
+with open(testfile, "w") as output:
+    writer = csv.writer(output, lineterminator='\n')
+    for x in range(len(ori)):
+        writer.writerow([ori[x]])
+
 # creating output list for failed extractions
 extF = ['failed']
 for x in range(len(ori)):
-    if ext1[x] == ext2[x] == ext3[x] == ext4[x] == 'X':
-        extF.append('X')
+    if ext1[x] == ext2[x] == ext3[x] == ext4[x] == '':
+        extF.append('')
     else:
         extF.append('extracted')
 
 # checking accuracy for each extraction (ignores lower/upper case diff)
 def check_accuracy(ans_list,my_list):
+    l1 = [x.lower() for x in ans_list]
+    l2 = [x.lower() for x in my_list]
     acc_list = []
     for x in range(len(ans_list)):
-        if ans_list[x] == 'X':
+        if ans_list[x] == '':
             acc_list.append(0)
         else:
-            acc_list.append(similar(ans_list[x],my_list[x]))
+            acc_list.append(similar(l1[x],l2[x]))
     return(acc_list)
 
 right_list = ['vendors'] + vendors_list
@@ -304,21 +358,46 @@ def extract(ori,ext1,ext2,ext3,ext4):
     final_list = []
     noExt_list = []
     for x in range(len(ext1)):
-        if ext1[x] != 'X':
+        if ext1[x] != '':
             final_list.append(ext1[x])
-        elif ext4[x] != 'X':
+        elif ext4[x] != '':
             final_list.append(ext4[x])
-        elif ext2[x] != 'X':
+        elif ext2[x] != '':
             final_list.append(ext2[x])
-        elif ext3[x] != 'X':
+        elif ext3[x] != '':
             final_list.append(ext3[x])
         else:
-            final_list.append('X')
+            final_list.append('')
             noExt_list.append(ori[x])
     return(final_list,noExt_list)
 
-final_output = extract(ext1,ext2,ext3,ext4)[0]
-noExt_list = extract(ext1,ext2,ext3,ext4)[1]
+# extraction firing process
+def extract2(ori,simp_list,ext1,ext2,ext3,ext4):
+    final_list = []
+    noExt_list = []
+    for x in range(len(ext1)):
+        if len(ext1[x]) > 2 and ext1[x] != '':
+            final_list.append(ext1[x])
+        elif len(ext4[x]) > 2 and ext4[x] != '':
+            final_list.append(ext4[x])
+        elif len(ext2[x]) > 2 and ext2[x] != '':
+            final_list.append(ext2[x])
+        elif len(ext3[x]) > 2 and ext3[x] != '':
+            final_list.append(ext3[x])
+        elif len(simp_list[x]) > 2:
+            final_list.append(simp_list[x])
+        else:
+            final_list.append('')
+            noExt_list.append(ori[x])
+    return(final_list,noExt_list)
+
+out2 = extract2(ori,simp_list,ext1,ext2,ext3,ext4)[0]
+out2[0] = 'lib output'
+acc_list2 = check_accuracy(right_list, out2)
+acc_list2[0] = 'accuracy'
+
+final_output = extract(ori,ext1,ext2,ext3,ext4)[0]
+noExt_list = extract(ori,ext1,ext2,ext3,ext4)[1]
 final_output[0] = 'output'
 
 extfa = [x.lower() for x in final_output]
@@ -326,18 +405,10 @@ extfa = [x.lower() for x in final_output]
 acc_list = check_accuracy(right_list, extfa)
 acc_list[0] = 'accuracy'
 
-# writing to tracking file
-
+# writing to tracking
 csvfile = 'tracking.csv'
 
 with open(csvfile, "w") as output:
     writer = csv.writer(output, lineterminator='\n')
     for x in range(len(ori)):
-        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],simp_list[x],right_list[x],ext1[x],acc1_list[x],ext2[x],acc2_list[x],ext3[x],acc3_list[x],ext4[x],acc4_list[x],extF[x],final_output[x],acc_list[x]])
-
-testfile = 'test.csv'
-
-with open(testfile, "w") as output:
-    writer = csv.writer(output, lineterminator='\n')
-    for x in range(len(ori)):
-        writer.writerow([ori[x],simp_list[x]])
+        writer.writerow([ori[x],sim1[x],sim2[x],sim3[x],sim4[x],sim5[x],sim6[x],simp_list[x],right_list[x],ext1[x],acc1_list[x],ext2[x],acc2_list[x],ext3[x],acc3_list[x],ext4[x],acc4_list[x],extF[x],final_output[x],acc_list[x],out2[x],acc_list2[x]])
