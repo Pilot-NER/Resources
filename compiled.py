@@ -248,7 +248,7 @@ def sim4x(memos_list):
     return(changed_list)
 
 def sim5(memos_list):
-    # ignore online/bank transfers
+    # remove the last instance of * and anything before it
     sim_list = []
     for x in range(len(memos_list)):
         if '*' in memos_list[x]:
@@ -258,7 +258,7 @@ def sim5(memos_list):
     return(sim_list)
 
 def sim5x(memos_list):
-    # ignore online/bank transfers
+    # remove the last instance of * and anything before it
     sim_list = []
     for x in range(len(memos_list)):
         if '*' in memos_list[x]:
@@ -268,6 +268,7 @@ def sim5x(memos_list):
     return(sim_list)
 
 def sim6(memos_list):
+    # remove punctuation
     sim_list = []
     a = ['"',',','.']
     for x in range(len(memos_list)):
@@ -280,6 +281,7 @@ def sim6(memos_list):
     return(sim_list)
 
 def sim6x(memos_list):
+    # remove punctuation
     sim_list = []
     a = ['"',',','.']
     for x in range(len(memos_list)):
